@@ -99,10 +99,23 @@
              perl6-program perl6-arguments)
       (perl6-shell-mode))))
 
+(defun perl6-send-to-repl (start end)
+  "Sends region from START to END to `*perl6*'."
+  (interactive "r")
+  (let ((buffer (current-buffer)))
+    (if (/= start end)
+        (with-current-buffer (get-buffer "*perl6*")
+          (insert-buffer-substring-no-properties buffer start end)
+          (comint-send-input))
+      (with-current-buffer (get-buffer "*perl6*")
+        (insert-buffer-substring-no-properties buffer (line-beginning-position) (line-end-position))
+        (comint-send-input)))))
+
 ;;;###autoload
 (eval-after-load 'perl6-mode
   '(progn
-     (define-key perl6-mode-map (kbd "C-c C-z") #'run-perl6)))
+     (define-key perl6-mode-map (kbd "C-c C-z") #'run-perl6)
+     (define-key perl6-mode-map (kbd "C-x C-e") #'perl6-send-to-repl)))
 
 (provide 'perl6-shell)
 
